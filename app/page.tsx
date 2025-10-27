@@ -1,65 +1,213 @@
-import Image from "next/image";
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
 
-export default function Home() {
+type Product = {
+  id: number;
+  name: string;
+  notes: string;
+  price: string;
+  imageUrl: string;
+};
+
+const PRODUCTS: Product[] = [
+  {
+    id: 1,
+    name: "Midnight Cherry",
+    notes: "Sweet, Warm, Seductive.",
+    price: "Rp 450.000",
+    imageUrl:
+      "https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1169",
+  },
+  {
+    id: 2,
+    name: "Ivory Bloom",
+    notes: "Bright, Romantic, Sensual.",
+    price: "Rp 520.000",
+    imageUrl:
+      "https://images.unsplash.com/photo-1458538977777-0549b2370168?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1174",
+  },
+  {
+    id: 3,
+    name: "Citrine Flame",
+    notes: "Fresh, Masculine, Elegant.",
+    price: "Rp 400.000",
+    imageUrl:
+      "https://images.unsplash.com/photo-1631722670977-60c8b22dfcaf?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1170",
+  },
+];
+
+const Home: React.FC = () => {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState({
+    mood: "",
+    time: "",
+    style: "",
+  });
+
+  const handleAnswer = (field: string, value: string) => {
+    setAnswers({ ...answers, [field]: value });
+    setStep(step + 1);
+  };
+
+  const getRecommendation = () => {
+    if (answers.mood === "romantis") return PRODUCTS[1];
+    if (answers.mood === "maskulin") return PRODUCTS[2];
+    return PRODUCTS[0];
+  };
+
+  const recommended = getRecommendation();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="bg-black text-white">
+      {/* Hero Section */}
+      <section className="min-h-screen flex flex-col items-center justify-center px-6 py-16 bg-black">
+        <h1 className="text-5xl font-light tracking-wide mb-6">Evoste</h1>
+        <p className="text-lg text-gray-300 mb-10 italic">
+          "Your scent. Their memory. Forever."
+        </p>
+        <p className="text-gray-400 leading-relaxed max-w-2xl text-center">
+          EVOSTE is more than a fragrance brand - it is a journey through the senses.
+          Each bottle holds a curated collection of exclusive scents, inspired by deep emotions,
+          unforgettable moments, and the untamed richness of nature.
+          <br />
+          <br />
+          Our fragrances are a tribute to elegance, authenticity, and individuality — designed for those who desire more than just perfume.
+          They are for those who seek connection, presence, and identity in every spritz.
+          With EVOSTE, scent becomes a signature, a statement, and a story.
+        </p>
+      </section>
+
+      {/* Catalog Section */}
+      <section className="px-6 py-16 max-w-7xl mx-auto bg-linear-to-b from-black via-gray-900 to-gray-800 transition-colors duration-700">
+        <h2 className="text-3xl font-light text-white mb-10 text-center">
+          Our Collection
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {PRODUCTS.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white text-black p-6 flex flex-col items-center rounded-lg shadow-md hover:shadow-lg transition-shadow"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="w-full h-auto object-cover mb-4 rounded"
+              />
+              <h3 className="text-xl font-medium mb-2">{product.name}</h3>
+              <p className="text-lg mb-4">{product.notes}</p>
+              <p className="text-lg mb-4">{product.price}</p>
+              <Link
+                href={`/product/${product.id}`}
+                className="border border-black px-5 py-2 text-sm uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
+              >
+                View Product
+              </Link>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+      </section>
+
+      {/* Interactive Quiz */}
+      <section className="bg-linear-to-b from-gray-800 via-gray-900 to-black py-16 text-center transition-colors duration-700">
+        <h2 className="text-3xl font-light mb-8">Find Your Perfect Scent</h2>
+
+        {step === 0 && (
+          <div>
+            <p className="mb-4 text-gray-300">What’s your current mood?</p>
+            <div className="flex justify-center gap-4 flex-wrap">
+              <button
+                onClick={() => handleAnswer("mood", "romantis")}
+                className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+              >
+                Romantic
+              </button>
+              <button
+                onClick={() => handleAnswer("mood", "maskulin")}
+                className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+              >
+                Masculine
+              </button>
+              <button
+                onClick={() => handleAnswer("mood", "misterius")}
+                className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+              >
+                Mysterious
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="mt-8">
+            <p className="mb-4 text-gray-300">When do you usually wear perfume?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => handleAnswer("time", "day")}
+                className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+              >
+                Daytime
+              </button>
+              <button
+                onClick={() => handleAnswer("time", "night")}
+                className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+              >
+                Night
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step > 1 && (
+          <div className="mt-10">
+            <h3 className="text-2xl font-light mb-4">Recommended for you:</h3>
+            <p className="text-lg text-gray-300 mb-4">{recommended.name}</p>
+            <Link
+              href={`/product/${recommended.id}`}
+              className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
+            >
+              View {recommended.name}
+            </Link>
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  setStep(0);
+                  setAnswers({ mood: "", time: "", style: "" });
+                }}
+                className="text-sm text-gray-400 underline hover:text-gray-200"
+              >
+                Retake Quiz
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-black py-20 text-center">
+        <h2 className="text-2xl mb-4 font-light">Stay Connected</h2>
+        <p className="mb-4 text-gray-300">
+          Let your story linger in every breath — make your scent unforgettable.
+        </p>
+        <div className="flex justify-center gap-4">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://instagram.com/hafidz.marsya"
             target="_blank"
-            rel="noopener noreferrer"
+            className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            Instagram
           </a>
           <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://wa.me/6281234567890"
             target="_blank"
-            rel="noopener noreferrer"
+            className="border border-white px-5 py-2 hover:bg-white hover:text-black transition"
           >
-            Documentation
+            WhatsApp
           </a>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
-}
+};
+
+export default Home;
